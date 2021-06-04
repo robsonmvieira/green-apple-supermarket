@@ -5,10 +5,6 @@ import { TypeormEntityBase } from '@infrastructure/database/base-classes/typeorm
 
 @Entity('categories')
 export class CategoryOrmEntity extends TypeormEntityBase {
-  constructor(props?: CategoryOrmEntity) {
-    super(props)
-  }
-
   @Column({ unique: true })
   name: string
 }
