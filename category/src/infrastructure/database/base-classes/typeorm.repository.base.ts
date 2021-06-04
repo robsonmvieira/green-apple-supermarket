@@ -1,11 +1,16 @@
-import { Repository } from 'typeorm'
+import { getRepository, ObjectType, Repository } from 'typeorm'
 
 import { ArgumentInvalidException } from '@core/exceptions/argument-invalid.exception'
 import { NotFoundException } from '@core/exceptions/not-found.exception'
 import { IRepositoryBase } from '@core/ports/repository.interface.base'
 
 export abstract class TypeormRepositoryBase<T> implements IRepositoryBase<T> {
-  protected constructor(protected repository: Repository<T>) {}
+  repository: Repository<T>
+  entity: ObjectType<T>
+
+  constructor() {
+    this.repository = getRepository(this.entity)
+  }
 
   async findAll(): Promise<T[]> {
     return this.repository.find()
