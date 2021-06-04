@@ -11,6 +11,7 @@ lerna-debug.log*
 .vscode
 yarn.lock
 node_modules
+ormconfig.js
 
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
