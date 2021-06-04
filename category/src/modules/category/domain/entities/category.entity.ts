@@ -1,12 +1,15 @@
 import { Entity } from '@core/base-classes/entity.base'
 
-import { CategoryProps } from './category.props'
+// import { CategoryProps } from './category.props'
+export interface CategoryProps {
+  name: string
+}
 
-export class CategoryEntity extends Entity {
+export class CategoryEntity extends Entity<CategoryProps> {
   name: string
 
-  constructor(props: CategoryProps) {
-    super()
-    this.name = props.name
+  constructor(payload: CategoryProps) {
+    super(payload)
+    this.name = payload.name
   }
 }
