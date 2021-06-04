@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe'
 
 import { ICategoryRepository } from '@infrastructure/repositories/category/category.interface.repository'
-import { CategoryEntity } from '@modules/category/domain/entities/category.entity'
-// import { CategoryResponse } from '@modules/category/dtos/category.response.dto'
+import { CategoryOrmEntity } from '@modules/category/database/category-orm.entity'
 
 @injectable()
 export class FindCategoryUseCase {
@@ -11,7 +10,7 @@ export class FindCategoryUseCase {
     private categoryRepository: ICategoryRepository
   ) {}
 
-  async execute(): Promise<CategoryEntity[]> {
+  async execute(): Promise<CategoryOrmEntity[]> {
     return this.categoryRepository.findAll()
   }
 }
