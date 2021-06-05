@@ -20,16 +20,13 @@ const pathFile = resolve(process.cwd(), 'config.yml')
 
 const readConfig = readFileSync(pathFile, { encoding: 'utf8' })
 
-const { services } = load(readConfig, { json: true })
-
-console.log(services)
+const { services } = load(readConfig, { json: true }) as Service[]
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'ok' })
 })
 
 services.forEach(({ name, url }: Service) => {
-  console.log(name, url)
   app.use(`/${name}`, httpProxy(url, { timeout: 5000 }))
 })
 
