@@ -5,6 +5,7 @@ import { ArgumentNotProvidedException } from '@core/exceptions/argument-not-prov
 import { NotFoundException } from '@core/exceptions/not-found.exception'
 import { ICategoryRepository } from '@infrastructure/repositories/category/category.interface.repository'
 
+import { UpdateCategoryDto } from '../dtos/update-category.dto'
 import { CategoryOrmEntity } from './category-orm.entity'
 
 export class CategoryRepository implements ICategoryRepository {
@@ -45,7 +46,7 @@ export class CategoryRepository implements ICategoryRepository {
 
   async update(
     id: string,
-    entity: CategoryOrmEntity
+    entity: UpdateCategoryDto
   ): Promise<CategoryOrmEntity> {
     const entityExists = await this.repository.findOne(id)
 
