@@ -2,6 +2,7 @@ import amqplib from 'amqplib'
 import process from 'process'
 
 import { IOnCategoryCreatedDomainEventHandler } from '@core/domain-events/domain-event-handler.interface'
+import { MessageTypes } from '@core/types/message-types.broker'
 
 import { CategoryCreatedDomainEvent } from '../domain/events/category-created.domain-event'
 
@@ -19,12 +20,14 @@ export class OnCategoryCreatedDomainEventHandler
   implements IOnCategoryCreatedDomainEventHandler
 {
   async onCategoryCreated(event: CategoryCreatedDomainEvent): Promise<void> {
+    const type = MessageTypes.CATEGORYCREATED
+
     const {
       data: { id, name },
       dateOccured
     } = event
     const queue = 'categories'
-    const category = { dateOccured, id, name }
+    const category = { dateOccured, type, id, name }
     try {
       const connect = await amqplib.connect(rabbitSettings)
       const channel = connect.createChannel()
