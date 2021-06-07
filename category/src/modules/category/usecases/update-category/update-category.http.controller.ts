@@ -5,7 +5,7 @@ import { UpdateCategoryDto } from '@modules/category/dtos/update-category.dto'
 
 import { UpdateCategoryUseCase } from './update-category.usecase'
 
-export class UpdateCategorydHttpController {
+export class UpdateCategoryHttpController {
   async handle(req: Request, res: Response): Promise<Response> {
     const useCase = container.resolve(UpdateCategoryUseCase)
     const { id } = req.params
