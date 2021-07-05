@@ -6,19 +6,19 @@ import { NotFoundException } from '@core/exceptions/not-found.exception'
 import { IProductRepository } from '@infrastructure/repositories/product/product.interface.repository'
 
 import { UpdateProductDto } from '../dtos/update-product.dto'
-import { ProductOrmEntity } from './product-orm.entity'
+import { Product } from './product-orm.entity'
 
 export class ProductRepository implements IProductRepository {
-  repository: Repository<ProductOrmEntity>
+  repository: Repository<Product>
   constructor() {
-    this.repository = getRepository(ProductOrmEntity)
+    this.repository = getRepository(Product)
   }
 
-  async findAll(): Promise<ProductOrmEntity[]> {
+  async findAll(): Promise<Product[]> {
     return this.repository.find()
   }
 
-  async findByNameOrThrow(name: string): Promise<ProductOrmEntity> {
+  async findByNameOrThrow(name: string): Promise<Product> {
     if (!name) {
       throw new ArgumentNotProvidedException('Product name cant be empty')
     }
@@ -31,7 +31,7 @@ export class ProductRepository implements IProductRepository {
     return productExists
   }
 
-  async findOneByIdOrThrow(id: string): Promise<ProductOrmEntity> {
+  async findOneByIdOrThrow(id: string): Promise<Product> {
     const entity = await this.repository.findOne(id)
 
     if (!entity) {
@@ -40,14 +40,12 @@ export class ProductRepository implements IProductRepository {
     return entity
   }
 
-  async create(entity: ProductOrmEntity): Promise<ProductOrmEntity> {
+  async create(entity: Product): Promise<Product> {
+    console.log(entity)
     return this.repository.save(entity)
   }
 
-  async update(
-    id: string,
-    entity: UpdateProductDto
-  ): Promise<ProductOrmEntity> {
+  async update(id: string, entity: UpdateProductDto): Promise<Product> {
     const entityExists = await this.repository.findOne(id)
 
     if (!entityExists) {
@@ -61,12 +59,11 @@ export class ProductRepository implements IProductRepository {
 
   async remove(id: string): Promise<boolean> {
     const entityExists = await this.repository.findOne(id)
-
     if (!entityExists) {
       throw new NotFoundException('Entity not found')
     }
 
-    const entityDeleted = await this.repository.delete(entityExists)
+    const entityDeleted = await this.repository.remove(entityExists)
 
     if (!entityDeleted) {
       throw new ArgumentInvalidException('Entity selected cant be deleted')

@@ -1,20 +1,32 @@
 version: '3.7'
 
 services: 
-  database_product_apple_supermarket:
-    image: postgres
-    container_name: msSupermarketProductDb
-    restart: always
-    ports: 
-      - 5432:5432
-    environment:
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-    volumes:
-      - pgdata:/data/postgres
-    network_mode: host
+  # database_product_apple_supermarket:
+  #   image: postgres
+  #   container_name: msSupermarketProductDb
+  #   restart: always
+  #   ports: 
+  #     - 5432:5432
+  #   environment:
+  #     - POSTGRES_USER=${DB_USERNAME}
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #     - POSTGRES_DB=${DB_NAME}
+  #   volumes:
+  #     - pgdata:/data/postgres
+  #   network_mode: host
 
+  # app:
+  #   build: .
+  #   container_name: product-microservice-gas
+  #   ports:
+  #     - 8005:8005
+  #   restart: always
+  #   volumes:
+  #     - .:/usr/app
+  #   command: sh -c "npm run typeorm migration:run && npm run dev"
+  #   network_mode: host
+  #   depends_on: 
+  #     - database_product_apple_supermarket
 
 volumes:
   pgdata:

@@ -23,5 +23,5 @@ const port = process.env.PORT
 app.use(errorInterceptor)
 
 app.listen(port, () =>
-  console.log('category api running on http://localhost:8001')
+  console.log('category api running on http://localhost:8004')
 )

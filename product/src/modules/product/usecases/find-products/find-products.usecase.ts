@@ -1,7 +1,8 @@
 import { inject, injectable } from 'tsyringe'
 
 import { IProductRepository } from '@infrastructure/repositories/product/product.interface.repository'
-import { ProductOrmEntity } from '@modules/product/database/product-orm.entity'
+import { PhotoMapper } from '@modules/photo/database/photo.mapper'
+import { ProductResponseDto } from '@modules/product/dtos/product.response.dto'
 
 @injectable()
 export class FindProductsUseCase {
@@ -10,7 +11,13 @@ export class FindProductsUseCase {
     private productRepository: IProductRepository
   ) {}
 
-  async execute(): Promise<ProductOrmEntity[]> {
-    return this.productRepository.findAll()
+  async execute(): Promise<ProductResponseDto[]> {
+    const tmp = await this.productRepository.findAll()
+    const res = tmp.map(el => ({
+      ...el,
+      images: el.images.map(photo => PhotoMapper.transformToDto(photo))
+    }))
+
+    return res
   }
 }

@@ -1,4 +1,5 @@
 import { CreateDateColumn, PrimaryColumn, UpdateDateColumn } from 'typeorm'
+import { v4 as uuidV4 } from 'uuid'
 
 export abstract class TypeormEntityBase {
   @PrimaryColumn('uuid')
@@ -9,4 +10,8 @@ export abstract class TypeormEntityBase {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt!: Date
+
+  constructor() {
+    this.id = uuidV4()
+  }
 }

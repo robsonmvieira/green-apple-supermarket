@@ -1,4 +1,5 @@
 import { Entity } from '@core/base-classes/entity.base'
+import { Photo } from '@modules/photo/domain/photo.entity'
 
 // import { CategoryProps } from './category.props'
 export interface ProductProps {
@@ -8,7 +9,7 @@ export interface ProductProps {
   description: string
   promotionalPrice?: string
   categoryId: string
-  images: string[]
+  images: Photo[]
 }
 
 export class ProductEntity extends Entity<ProductProps> {
@@ -17,7 +18,7 @@ export class ProductEntity extends Entity<ProductProps> {
   description: string
   promotionalPrice?: string
   categoryId: string
-  images: string[]
+  images: Photo[]
 
   constructor(payload: ProductProps) {
     super(payload)

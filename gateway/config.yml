@@ -1,3 +1,5 @@
 services:
   - name: categories
     url : http://localhost:8001
+  - name: products
+    url:  http://localhost:8002

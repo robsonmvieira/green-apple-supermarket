@@ -8,6 +8,7 @@
     "build": "babel src --extensions \".js,.ts\" --out-dir  dist --copy-files",
     "dev": "ts-node-dev --inspect --respawn --transpile-only --ignore-watch node_modules -r tsconfig-paths/register ./src/server.ts",
     "typeorm": "ts-node-dev --inspect -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "initial": "yarn typeorm migration:run",
     "test": "jest --maxWorkers=50%",
     "test:verbose": "yarn jest --verbose",
     "start": "node ./dist/server.js"

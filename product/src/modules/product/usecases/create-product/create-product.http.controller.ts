@@ -5,11 +5,17 @@ import { CreateProductDto } from '@modules/product/dtos/create-product.dto'
 
 import { CreateProductUseCase } from './create-product.usecase'
 
+interface PhotoProps {
+  filename: string
+}
+
 export class CreateProductHttpController {
-  async handle(req: Request, res: Response): Promise<Response> {
+  async handle(request: Request, res: Response): Promise<Response> {
+    const files = request.files as PhotoProps[]
+    const fileNames = files.map(el => el.filename)
     const useCase = container.resolve(CreateProductUseCase)
-    const { name, description, price, promotionalPrice, categoryId, images } =
-      req.body as CreateProductDto
+    const { name, description, price, promotionalPrice, categoryId } =
+      request.body as CreateProductDto
 
     const result = await useCase.execute({
       name,
@@ -17,8 +23,9 @@ export class CreateProductHttpController {
       price,
       promotionalPrice,
       categoryId,
-      images
+      images: fileNames
     })
+
     return res.status(201).json(result)
   }
 }

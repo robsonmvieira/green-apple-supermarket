@@ -1,16 +1,20 @@
+/* eslint-disable no-restricted-syntax */
+import { StorageProvider } from 'interface-adapters/storage/storage.provider'
 import { inject, injectable } from 'tsyringe'
 
+import { IPhotoRepository } from '@infrastructure/repositories/photo/photo.interface.repository'
 import { IProductRepository } from '@infrastructure/repositories/product/product.interface.repository'
-import { ProductOrmEntity } from '@modules/product/database/product-orm.entity'
-import { ProductEntity } from '@modules/product/domain/entities/product.entity'
+import { Photo } from '@modules/photo/database/photo-orm.entity'
+import { Product } from '@modules/product/database/product-orm.entity'
 import { CreateProductDto } from '@modules/product/dtos/create-product.dto'
-import { ProductResponse } from '@modules/product/dtos/product.response.dto'
 
 @injectable()
 export class CreateProductUseCase {
   constructor(
+    @inject('StorageProvider') private storageProvider: StorageProvider,
+    @inject('IPhotoRepository') private photoRepository: IPhotoRepository,
     @inject('IProductRepository')
-    private productRepository: IProductRepository // @inject('IOnCategoryCreatedDomainEventHandler') // private domainHandler: IOnCategoryCreatedDomainEventHandler
+    private productRepository: IProductRepository
   ) {}
 
   async execute({
@@ -20,18 +24,26 @@ export class CreateProductUseCase {
     promotionalPrice,
     categoryId,
     images
-  }: CreateProductDto): Promise<ProductResponse> {
-    const newProduct = new ProductEntity({
-      name,
-      description,
-      price,
-      promotionalPrice,
-      categoryId,
-      images
-    }).toObject() as ProductEntity
-    const productOrm = Object.assign(newProduct, new ProductOrmEntity())
-    await this.productRepository.create(productOrm)
+  }: CreateProductDto): Promise<Product> {
+    const productPhotos: Photo[] = []
 
-    return new ProductResponse(newProduct)
+    for await (const image of images) {
+      const newImage = new Photo(image)
+      await this.storageProvider.save(newImage.fileName, 'products')
+      await this.photoRepository.create(newImage)
+      productPhotos.push(newImage)
+    }
+    const newProduct = new Product(
+      name,
+      price,
+      description,
+      categoryId,
+      productPhotos,
+      promotionalPrice || undefined
+    )
+
+    this.productRepository.create(newProduct)
+
+    return newProduct
   }
 }

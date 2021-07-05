@@ -6,6 +6,7 @@ import morgan from 'morgan'
 import 'express-async-errors'
 import 'reflect-metadata'
 import routes from '@infrastructure/configs/routes'
+import upload from '@infrastructure/configs/utils/upload'
 import errorInterceptor from '@infrastructure/interceptors/error.interceptor'
 
 // import './consumer'
@@ -22,6 +23,8 @@ const port = process.env.PORT
 
 app.use(errorInterceptor)
 
+app.use('/products', express.static(`${upload.tmpFolder}/products}`))
+
 app.listen(port, () =>
-  console.log('category api running on http://localhost:8002')
+  console.log('product api running on http://localhost:8005')
 )

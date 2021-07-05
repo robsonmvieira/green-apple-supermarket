@@ -1,19 +1,23 @@
-import { ProductEntity } from '../domain/entities/product.entity'
-import { ProductOrmEntity } from './product-orm.entity'
+import { classToClass } from 'class-transformer'
 
-export class ProductOrmMapper {
-  static fromOrmtoEntity(entity: ProductOrmEntity): ProductEntity {
-    const props = { ...entity }
-    const result = Object.assign(
-      new ProductEntity({ id: props.id, name: props.name }),
-      { ...props }
-    )
-    return result
-  }
+import { ProductResponseDto } from '../dtos/product.response.dto'
+import { Product } from './product-orm.entity'
 
-  static fromEntityToOrm(entity: ProductEntity): ProductOrmEntity {
-    const props = { ...entity }
-    const result = Object.assign(new ProductOrmEntity(), { ...props })
-    return result
+export class ProductMapper {
+  static transforToDto({
+    id,
+    name,
+    price,
+    promotionalPrice,
+    images
+  }: Product): ProductResponseDto {
+    const product = classToClass({
+      id,
+      name,
+      price,
+      promotionalPrice,
+      images
+    })
+    return product
   }
 }

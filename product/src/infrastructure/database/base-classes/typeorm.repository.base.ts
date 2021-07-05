@@ -8,8 +8,9 @@ export abstract class TypeormRepositoryBase<T> implements IRepositoryBase<T> {
   repository: Repository<T>
   entity: ObjectType<T>
 
-  constructor() {
+  constructor(entity: ObjectType<T>) {
     this.repository = getRepository(this.entity)
+    this.entity = entity
   }
 
   async findAll(): Promise<T[]> {
