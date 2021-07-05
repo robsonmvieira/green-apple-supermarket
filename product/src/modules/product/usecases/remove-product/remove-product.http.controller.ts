@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { container } from 'tsyringe'
 
-import { RemoveCategoryUseCase } from './remove-category.usecase'
+import { RemoveProductUseCase } from './remove-product.usecase'
 
-export class RemoveCategoryHttpController {
+export class RemoveProductByIdHttpController {
   async handle(req: Request, res: Response): Promise<Response> {
-    const useCase = container.resolve(RemoveCategoryUseCase)
+    const useCase = container.resolve(RemoveProductUseCase)
     const { id } = req.params
 
     const result = await useCase.execute(id)
