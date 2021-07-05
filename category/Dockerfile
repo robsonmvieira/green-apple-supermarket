@@ -1,13 +1,16 @@
-FROM node
+FROM node:alpine
 
-WORKDIR /urs/app
+WORKDIR /usr/app
 
 COPY package.json ./
 
 RUN npm install
-
 COPY . .
 
-EXPOSE 8001
+EXPOSE 8004
+
+
+# RUN npm run initial
 
 CMD ["npm", "run", "dev"]
+
