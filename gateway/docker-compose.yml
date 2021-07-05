@@ -1,0 +1,187 @@
+version: "3"
+ 
+networks:
+ kong-net:
+  # external: true
+  driver: bridge
+ 
+services:
+ 
+  #######################################
+  # Postgres: The database used by Kong
+  #######################################
+  kong-database:
+    container_name: kong-db
+    image: postgres:9.6
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kong
+    ports:
+      - "5433:5433"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+ 
+  #######################################
+  # Kong database migration
+  #######################################
+  kong-migration:
+    container_name: kong-db-migration
+    image: kong:latest
+    command: "kong migrations bootstrap"
+    networks:
+      - kong-net
+    restart: on-failure
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_DATABASE=kong
+      - KONG_PG_PASSWORD=kong
+    links:
+      - kong-database
+    depends_on:
+      - kong-database
+ 
+  #######################################
+  # Kong: The API Gateway
+  #######################################
+  kong:
+    container_name: kong-api
+    image: kong:latest
+    restart: always
+    networks:
+      - kong-net
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kong
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    depends_on:
+      - kong-migration
+    links:
+      - kong-database
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://kong:8001"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
+    ports:
+      - "8001:8001"
+      - "8000:8000"
+      - "8443:8443"
+ 
+ 
+  #######################################
+  # Konga database prepare
+  #######################################
+  konga-prepare:
+    container_name: konga-prepare-container
+    image: pantsel/konga:latest
+    command: "-c prepare -a postgres -u postgresql://kong:kong@kong-database:5432/konga"
+    networks:
+      - kong-net
+    restart: on-failure
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_DATABASE=konga
+      - KONG_PG_PASSWORD=kong
+    links:
+      - kong-database
+    depends_on:
+      - kong-database
+ 
+  #######################################
+  # Konga: Kong GUI
+  #######################################
+  konga:
+    container_name: konga-container
+    image: pantsel/konga:latest
+    restart: always
+    networks:
+     - kong-net
+    environment:
+      DB_ADAPTER: postgres
+      DB_URI: postgresql://kong:kong@kong-database:5432/konga
+      NODE_ENV: production
+    links:
+      - kong-database
+    depends_on:
+      - kong
+      - konga-prepare
+    ports:
+      - "1337:1337"
+
+  # category Microservice
+  categories:
+    image:  rmaia/category-gas-microservice:latest
+    container_name: category-micro-service
+    command: sh -c "npm run typeorm migration:run && npm run dev"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://categories:8004"]
+    restart: always
+    ports:
+      - 8004:8004
+    depends_on: 
+      - database_category_apple_supermarket
+    networks:
+      - kong-net
+
+  # products Microservice
+  products:
+    image:  rmaia/product-gas-microservice:latest
+    container_name: product-micro-service
+    command: sh -c "npm run typeorm migration:run && npm run dev"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://categories:8005"]
+    restart: always
+    ports:
+      - 8005:8005
+    depends_on: 
+      - database_product_apple_supermarket
+    networks:
+      - kong-net
+    
+
+  # category db container
+  database_category_apple_supermarket:
+    image: postgres
+    container_name: msSupermarketCategoryDb
+    restart: always
+    ports: 
+      - 5434:5432
+    environment:
+      - POSTGRES_USER=${CATEGORY_DB_USERNAME}
+      - POSTGRES_PASSWORD=${CATEGORY_DB_PASSWORD}
+      - POSTGRES_DB=${CATEGORY_DB_NAME}
+    volumes:
+      - pgdata:/data/postgres
+    networks:
+      - kong-net
+
+  # product db container
+  database_product_apple_supermarket:
+    image: postgres
+    container_name: msSupermarketProductDb
+    restart: always
+    ports: 
+      - 5435:5432
+    environment:
+      - POSTGRES_USER=${PRODUCT_DB_USERNAME}
+      - POSTGRES_PASSWORD=${PRODUCT_DB_PASSWORD}
+      - POSTGRES_DB=${PRODUCT_DB_NAME}
+    volumes:
+      - pgdata:/data/postgres
+    networks:
+      - kong-net
+
+volumes:
+  pgdata:
